@@ -27,7 +27,7 @@ export default function HeartScene() {
       75,
       mount.clientWidth / mount.clientHeight,
       0.1,
-      100,
+      200,
     );
     camera.position.z = 5;
 
@@ -55,7 +55,7 @@ export default function HeartScene() {
     const colors = [0xe8375a, 0xff6b8a, 0xc8973a, 0xb01840, 0xff9eb5];
     const hearts: THREE.Mesh[] = [];
 
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 25; i++) {
       const material = new THREE.MeshStandardMaterial({
         color: colors[Math.floor(Math.random() * colors.length)],
         metalness: 0.3,
@@ -67,9 +67,9 @@ export default function HeartScene() {
       const scale = 0.15 + Math.random() * 0.35;
       heart.scale.setScalar(scale);
       heart.position.set(
-        (Math.random() - 0.5) * 12,
-        (Math.random() - 0.5) * 8,
-        (Math.random() - 0.5) * 4,
+        (Math.random() - 0.5) * 20,
+        (Math.random() - 0.5) * 14,
+        (Math.random() - 0.5) * 6,
       );
       heart.rotation.set(
         Math.random() * Math.PI,
