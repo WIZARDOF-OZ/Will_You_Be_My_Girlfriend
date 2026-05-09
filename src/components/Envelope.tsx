@@ -10,6 +10,7 @@ export default function Envelope() {
 
   // Floating loop — runs forever independently
   useEffect(() => {
+    if (!envelopeRef.current) return;
     animate(envelopeRef.current, {
       translateY: [-6, 6],
       duration: 2200,
@@ -23,32 +24,35 @@ export default function Envelope() {
     if (isOpen) return;
     setIsOpen(true);
 
+    //adds a null check
+
     // Hide hint
-    animate(hintRef.current, {
-      opacity: [0.8, 0],
-      duration: 300,
-      ease: "outExpo",
-    });
-
+    if (hintRef.current)
+      animate(hintRef.current, {
+        opacity: [0.8, 0],
+        duration: 300,
+        ease: "outExpo",
+      });
     // Flap opens
-    animate(flapRef.current, {
-      rotateX: [0, -180],
-      duration: 700,
-      ease: "outCubic",
-    });
-
+    if (flapRef.current)
+      animate(flapRef.current, {
+        rotateX: [0, -180],
+        duration: 700,
+        ease: "outCubic",
+      });
     // Letter popup appears in center of screen
-    animate(letterRef.current, {
-      opacity: [0, 1],
-      scale: [0.8, 1],
-      duration: 700,
-      delay: 600,
-      ease: "outExpo",
-    });
+    if (letterRef.current)
+      animate(letterRef.current, {
+        opacity: [0, 1],
+        scale: [0.8, 1],
+        duration: 700,
+        delay: 600,
+        ease: "outExpo",
+      });
   };
 
   const handleHover = () => {
-    if (!isOpen) {
+    if (!isOpen && envelopeRef.current) {
       animate(envelopeRef.current, {
         rotate: [-2, 2, -2, 2, 0],
         duration: 500,
