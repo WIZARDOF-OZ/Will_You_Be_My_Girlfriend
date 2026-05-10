@@ -26,13 +26,14 @@ export default function HeroSection() {
       });
 
       // Animate emoji after title finishes
-      animate(emojiRef.current, {
-        opacity: [0, 1],
-        translateY: [40, 0],
-        delay: 1400,
-        ease: "outExpo",
-        duration: 800,
-      });
+      if (emojiRef.current)
+        animate(emojiRef.current, {
+          opacity: [0, 1],
+          translateY: [40, 0],
+          delay: 1400,
+          ease: "outExpo",
+          duration: 800,
+        });
     }
   }, []);
 
