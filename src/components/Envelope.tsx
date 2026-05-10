@@ -224,14 +224,15 @@ export default function Envelope() {
             >
               <polygon points="0,42 140,130 280,42" fill="#f48fb1" />
             </g>
-
-            <circle cx="140" cy="115" r="24" fill="#8b0000" />
-            <circle cx="140" cy="115" r="20" fill="#b01840" />
-            <circle cx="140" cy="115" r="16" fill="#e8375a" />
-            <path
-              d="M140 122 C140 122 130 115 130 109 C130 105 133 102 136.5 102 C138.5 102 140 103.5 140 103.5 C140 103.5 141.5 102 143.5 102 C147 102 150 105 150 109 C150 115 140 122 140 122Z"
-              fill="white"
-            />
+            <circle cx="140" cy="120" r="24" fill="#8b0000" />
+            <circle cx="140" cy="120" r="20" fill="#b01840" />
+            <circle cx="140" cy="120" r="16" fill="#e8375a" />
+            <g transform="translate(140, 123)">
+              <path
+                d="M0 6 C0 6 -10 0 -10 -5 C-10 -9 -7 -11 -4 -11 C-2 -11 0 -9.5 0 -9.5 C0 -9.5 2 -11 4 -11 C7 -11 10 -9 10 -5 C10 0 0 6 0 6Z"
+                fill="white"
+              />
+            </g>
           </svg>
         </div>
       </div>
