@@ -64,7 +64,7 @@ export default function HeroSection() {
           ref={titleRef}
           style={{
             fontFamily: "'Playfair Display', serif",
-            fontSize: "clamp(1.8rem, 4vw, 4.5rem)",
+            fontSize: "clamp(1.5rem, 6vw, 4.5rem)",
             color: "#fff5f0",
             lineHeight: 1.1,
           }}
@@ -78,6 +78,8 @@ export default function HeroSection() {
             fontSize: "clamp(1.8rem, 4vw, 4.5rem)",
             opacity: 0,
             display: "inline-block",
+            wordBreak: "keep-all",
+            whiteSpace: "nowrap",
           }}
         >
           🌹

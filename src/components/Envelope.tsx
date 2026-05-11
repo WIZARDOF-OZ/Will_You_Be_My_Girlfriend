@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { animate } from "animejs";
 
 const MESSAGES = [
+  "Will you be my girlfriend? 💕",
   "Are you sure? 🥺",
   "That's not it bestie 😭",
   "Why are you like this 😤",
@@ -10,17 +11,7 @@ const MESSAGES = [
   "YOU KEEP MISSING 💀",
   "I'm not giving up 😤",
   "Last warning... 👀",
-  "The No button has left the chat 😚",
-];
-
-const NO_POSITIONS = [
-  { x: "55%", y: "50%" },
-  { x: "52%", y: "20%" },
-  { x: "54%", y: "80%" },
-  { x: "50%", y: "35%" },
-  { x: "56%", y: "65%" },
-  { x: "51%", y: "10%" },
-  { x: "53%", y: "90%" },
+  "The No button has left the chat 🤭",
 ];
 
 export default function Envelope() {
@@ -29,13 +20,17 @@ export default function Envelope() {
   const letterRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLParagraphElement>(null);
   const yesBtnRef = useRef<HTMLButtonElement>(null);
+  const noBtnRef = useRef<HTMLButtonElement>(null);
 
   const [isOpen, setIsOpen] = useState(false);
   const [saidYes, setSaidYes] = useState(false);
   const [noAttempts, setNoAttempts] = useState(0);
-  const [noPos, setNoPos] = useState({ x: "55%", y: "50%" });
   const [noGone, setNoGone] = useState(false);
-  const [message, setMessage] = useState("Will you be my girlfriend? 💕");
+  const [noBehind, setNoBehind] = useState(false);
+  const [noStarted, setNoStarted] = useState(false);
+  const [noPos, setNoPos] = useState({ x: 200, y: 200 });
+
+  const message = MESSAGES[Math.min(noAttempts, MESSAGES.length - 1)];
 
   // Floating loop
   useEffect(() => {
@@ -49,16 +44,14 @@ export default function Envelope() {
     });
   }, []);
 
-  // Grow Yes button when No disappears
-  useEffect(() => {
-    if (noGone && yesBtnRef.current) {
-      animate(yesBtnRef.current, {
-        scale: [1, 1.8],
-        duration: 600,
-        ease: "outBack",
-      });
-    }
-  }, [noGone]);
+  const getRandomPos = () => {
+    const btnW = noBtnRef.current?.offsetWidth ?? 100;
+    const btnH = noBtnRef.current?.offsetHeight ?? 44;
+    const pad = 24;
+    const x = pad + Math.random() * (window.innerWidth - btnW - pad * 2);
+    const y = pad + Math.random() * (window.innerHeight - btnH - pad * 2);
+    return { x, y };
+  };
 
   const handleOpen = () => {
     if (isOpen) return;
@@ -98,29 +91,26 @@ export default function Envelope() {
     }
   };
 
-  const handleNoHover = () => {
+  const handleNoClick = () => {
     if (noGone) return;
 
     const next = noAttempts + 1;
     setNoAttempts(next);
-    setMessage(MESSAGES[Math.min(next - 1, MESSAGES.length - 1)]);
 
     if (next >= 9) {
-      // No button disappears!
       setNoGone(true);
       return;
     }
 
     if (next === 5) {
-      // Half overlap on Yes button
-      setNoPos({ x: "22%", y: "0px" });
-      return;
+      setNoBehind(true);
+    } else {
+      setNoBehind(false);
     }
 
-    // Pick random position
-    const available = NO_POSITIONS.filter((p) => p.x !== noPos.x);
-    const next_pos = available[Math.floor(Math.random() * available.length)];
-    setNoPos(next_pos);
+    // Set position FIRST then show flying button
+    setNoPos(getRandomPos());
+    setNoStarted(true);
   };
 
   const handleYes = () => {
@@ -129,7 +119,7 @@ export default function Envelope() {
 
   return (
     <>
-      {/* YES Celebration screen */}
+      {/* YES Celebration */}
       {saidYes && (
         <div
           style={{
@@ -187,6 +177,7 @@ export default function Envelope() {
           pointerEvents: isOpen ? "auto" : "none",
         }}
       >
+        {/* Gold line top */}
         <div
           style={{
             width: "40px",
@@ -211,22 +202,24 @@ export default function Envelope() {
           ask you something..."
         </p>
 
-        {/* Message changes on each No attempt */}
+        {/* Dynamic message */}
         <p
           style={{
             fontFamily: "'Playfair Display', serif",
-            fontSize: "1.2rem",
+            fontSize: "1.15rem",
             color: "#e8375a",
             fontWeight: 700,
-            marginBottom: "0.75rem",
-            minHeight: "60px",
-            transition: "all 0.3s ease",
+            marginBottom: "1rem",
+            minHeight: "56px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           {message}
         </p>
 
-        {/* Resistance is futile text — shows when No is gone */}
+        {/* Resistance is futile */}
         {noGone && (
           <p
             style={{
@@ -241,49 +234,43 @@ export default function Envelope() {
           </p>
         )}
 
-        {/* Buttons area */}
+        {/* Buttons */}
         <div
           style={{
-            position: "relative",
-            height: "70px",
-            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "1rem",
+            marginTop: "0.5rem",
             marginBottom: "0.5rem",
           }}
         >
-          {/* Yes button — always fixed on left */}
+          {/* YES button */}
           <button
             ref={yesBtnRef}
             onClick={handleYes}
             style={{
-              position: "absolute",
-              left: "50%",
-              top: "50%",
-              transform: "translate(-120%, -50%)",
               padding: "0.6rem 1.5rem",
               background: "#e8375a",
               border: "none",
               borderRadius: "3px",
               color: "#fff5f0",
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: noGone ? "1.6rem" : "1.05rem",
+              fontSize: noGone ? "1.5rem" : "1.05rem",
               cursor: "pointer",
-              transition: "font-size 0.3s ease",
-              zIndex: 2,
-              whiteSpace: "nowrap",
+              transition: "all 0.4s ease",
+              width: noGone ? "100%" : "auto",
             }}
           >
             Yes ♥
           </button>
 
-          {/* No button — moves on CLICK */}
-          {!noGone && (
+          {/* NO button — shows inline until first click */}
+          {!noStarted && !noGone && (
             <button
-              onClick={handleNoHover}
+              ref={noBtnRef}
+              onClick={handleNoClick}
               style={{
-                position: "absolute",
-                left: noPos.x,
-                top: noPos.y,
-                transform: "translateY(-50%)",
                 padding: "0.6rem 1.5rem",
                 background: "transparent",
                 border: "1px solid #e8375a",
@@ -292,9 +279,6 @@ export default function Envelope() {
                 fontFamily: "'Cormorant Garamond', serif",
                 fontSize: "1.05rem",
                 cursor: "pointer",
-                transition: "left 0.25s ease, top 0.25s ease",
-                zIndex: noAttempts === 5 ? 1 : 3,
-                whiteSpace: "nowrap",
               }}
             >
               No
@@ -302,15 +286,43 @@ export default function Envelope() {
           )}
         </div>
 
+        {/* Gold line bottom */}
         <div
           style={{
             width: "40px",
             height: "1px",
             background: "#c8973a",
-            margin: "1.25rem auto 0",
+            margin: "1rem auto 0",
           }}
         />
       </div>
+
+      {/* NO button flying around screen after first click */}
+      {noStarted && !noGone && (
+        <button
+          ref={noBtnRef}
+          onClick={handleNoClick}
+          style={{
+            position: "fixed",
+            left: `${noPos.x}px`,
+            top: `${noPos.y}px`,
+            padding: "0.6rem 1.5rem",
+            background: "rgba(255,245,240,0.95)",
+            border: "1px solid #e8375a",
+            borderRadius: "3px",
+            color: "#e8375a",
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: "1.05rem",
+            cursor: "pointer",
+            transition: "left 0.25s ease, top 0.25s ease",
+            // At attempt 5 goes behind popup (zIndex 99 < popup 100)
+            zIndex: noBehind ? 99 : 200,
+            boxShadow: "0 4px 15px rgba(232,55,90,0.3)",
+          }}
+        >
+          No
+        </button>
+      )}
 
       {/* Blur overlay */}
       {isOpen && (
@@ -319,7 +331,7 @@ export default function Envelope() {
             position: "fixed",
             inset: 0,
             background: "rgba(10, 2, 8, 0.6)",
-            zIndex: 99,
+            zIndex: 98,
             backdropFilter: "blur(3px)",
           }}
         />
