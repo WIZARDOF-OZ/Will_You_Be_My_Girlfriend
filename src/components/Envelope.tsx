@@ -126,7 +126,7 @@ export default function Envelope() {
             position: "fixed",
             inset: 0,
             background: "rgba(10, 2, 8, 0.97)",
-            zIndex: 300,
+            zIndex: 1040,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -171,7 +171,7 @@ export default function Envelope() {
           borderRadius: "6px",
           padding: "2rem 1.75rem",
           opacity: 0,
-          zIndex: 100,
+          zIndex: 1020,
           boxShadow: "0 16px 60px rgba(232, 55, 90, 0.3)",
           textAlign: "center",
           pointerEvents: isOpen ? "auto" : "none",
@@ -315,8 +315,8 @@ export default function Envelope() {
             fontSize: "1.05rem",
             cursor: "pointer",
             transition: "left 0.25s ease, top 0.25s ease",
-            // At attempt 5 goes behind popup (zIndex 99 < popup 100)
-            zIndex: noBehind ? 99 : 200,
+            // At attempt 5 goes behind popup (zIndex 1019 < popup 1020)
+            zIndex: noBehind ? 1019 : 1030,
             boxShadow: "0 4px 15px rgba(232,55,90,0.3)",
           }}
         >
@@ -324,14 +324,14 @@ export default function Envelope() {
         </button>
       )}
 
-      {/* Blur overlay */}
+      {/* Blur overlay — must sit above music player (z:1000) */}
       {isOpen && (
         <div
           style={{
             position: "fixed",
             inset: 0,
             background: "rgba(10, 2, 8, 0.6)",
-            zIndex: 98,
+            zIndex: 1010,
             backdropFilter: "blur(3px)",
           }}
         />
@@ -343,7 +343,7 @@ export default function Envelope() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          paddingBottom: "3rem",
+          paddingBottom: "calc(3rem + 200px)", // extra clearance for fixed music player
           position: "relative",
           zIndex: 1,
         }}

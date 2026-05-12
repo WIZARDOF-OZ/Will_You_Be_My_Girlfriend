@@ -40,7 +40,7 @@ export const FEATURED_SONGS = [
     artist: "Atif Aslam",
   },
   {
-    id: "MBePwJgQpXk",
+    id: "k6dGN3azeqo",
     title: "Kalank",
     artist: "Arijit Singh",
   },
@@ -50,7 +50,7 @@ export const FEATURED_SONGS = [
     artist: "JAWNY",
   },
   {
-    id: "bjHJg_2qPkM",
+    id: "PT2_F-1esPk",
     title: "Closer",
     artist: "The Chainsmokers",
   },
