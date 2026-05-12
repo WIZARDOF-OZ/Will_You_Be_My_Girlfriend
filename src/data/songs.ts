@@ -15,7 +15,7 @@ export const FEATURED_SONGS = [
     artist: "Aditya Rikhari",
   },
   {
-    id: "n2dVFdqMYGA",
+    id: "CNgPob9hPO4",
     title: "Paro",
     artist: "Aditya Rikhari",
   },
