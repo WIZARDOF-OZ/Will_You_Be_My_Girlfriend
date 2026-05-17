@@ -343,7 +343,7 @@ export default function Envelope() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          paddingBottom: "calc(3rem + 200px)", // extra clearance for fixed music player
+          paddingBottom: "6rem",
           position: "relative",
           zIndex: 1,
         }}

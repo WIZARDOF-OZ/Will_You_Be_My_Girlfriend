@@ -41,19 +41,15 @@ declare global {
   }
 }
 
-/* ─── Build unified queue ─────────────────────────────────────────────
-   On each page load, pick a random featured song as the opener,
-   then append ALL playlist songs in their original order.            */
-function buildQueue() {
-  const featuredIndex = Math.floor(Math.random() * FEATURED_SONGS.length);
-  const featuredSong = FEATURED_SONGS[featuredIndex];
-  return [featuredSong, ...PLAYLIST_SONGS];
-}
-
-const SONGS = buildQueue();
+/* ─── Initial queue ───────────────────────────────────────────────────
+   One random featured song opens. The rest are injected after it ends. */
+const _openerIdx = Math.floor(Math.random() * FEATURED_SONGS.length);
+const _opener = FEATURED_SONGS[_openerIdx];
+const _restFeat = FEATURED_SONGS.filter((_, i) => i !== _openerIdx);
+const _initialQ = [_opener, ...PLAYLIST_SONGS];
 
 /* ─── Responsive helpers ──────────────────────────────────────────────── */
-const isMobile = () => typeof window !== "undefined" && window.innerWidth < 480;
+const isMobile = () => typeof window !== "undefined" && window.innerWidth < 945;
 
 /* ─── Smart next: never repeat last 2 songs in shuffle ───────────────── */
 function getNextIndex(
@@ -78,7 +74,7 @@ const S: Record<string, React.CSSProperties> = {
     position: "fixed",
     bottom: "1rem",
     right: "1rem",
-    zIndex: 1000,
+    zIndex: 1015,
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-end",
@@ -90,12 +86,13 @@ const S: Record<string, React.CSSProperties> = {
     width: "min(280px, calc(100vw - 2rem))",
     maxHeight: "260px",
     overflowY: "auto",
-    background: "rgba(26,10,15,0.95)",
-    border: "1px solid rgba(200,151,58,0.25)",
+    background: "rgba(10,3,8,0.97)",
+    border: "1px solid rgba(200,151,58,0.2)",
     borderRadius: "16px",
-    backdropFilter: "blur(24px)",
+    backdropFilter: "blur(32px)",
     padding: "0.5rem 0",
-    boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+    boxShadow:
+      "0 8px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.03)",
   },
   playlistTitle: {
     fontSize: "0.7rem",
@@ -365,6 +362,14 @@ const fmt = (s: number) => {
    MusicPlayer Component
 ════════════════════════════════════════════════════════════════════════ */
 export default function MusicPlayer() {
+  // Dynamic queue: starts as opener + playlist; featured songs splice in after opener ends
+  const [songs, setSongs] = useState(_initialQ);
+  const songsRef = useRef(songs);
+  const featuredAddedRef = useRef(false);
+  useEffect(() => {
+    songsRef.current = songs;
+  }, [songs]);
+
   const [ready, setReady] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [index, setIndex] = useState(0);
@@ -387,10 +392,17 @@ export default function MusicPlayer() {
   const historyRef = useRef<number[]>([0]);
 
   const playerRef = useRef<YTPlayer | null>(null);
-  const iframeContainerRef = useRef<HTMLDivElement>(null);
+  // Container created imperatively outside React (see useEffect) so React never unmounts it
+  const iframeContainerRef = useRef<HTMLDivElement | null>(null);
   const tickRef = useRef<number>(0);
   const indexRef = useRef(index);
   const shuffleRef = useRef(shuffle);
+  const pendingPlayRef = useRef(false);
+  // Mirror refs — YouTube effect runs with empty deps, these always hold latest callbacks
+  const goNextRef = useRef<() => void>(() => {});
+  const goToRef = useRef<(i: number) => void>(() => {});
+  const startTickRef = useRef<() => void>(() => {});
+  const stopTickRef = useRef<() => void>(() => {});
 
   // Responsive
   const [mobile, setMobile] = useState(isMobile());
@@ -428,14 +440,16 @@ export default function MusicPlayer() {
 
   const goTo = useCallback(
     (i: number) => {
-      const idx = ((i % SONGS.length) + SONGS.length) % SONGS.length;
+      const idx =
+        ((i % songsRef.current.length) + songsRef.current.length) %
+        songsRef.current.length;
       historyRef.current.push(idx);
       if (historyRef.current.length > 10) historyRef.current.shift();
       setIndex(idx);
       setProgress(0);
       setCurrent(0);
       setDuration(0);
-      playerRef.current?.loadVideoById(SONGS[idx].id);
+      playerRef.current?.loadVideoById(songsRef.current[idx].id);
       setPlaying(true);
       startTick();
     },
@@ -445,21 +459,34 @@ export default function MusicPlayer() {
   const goNext = useCallback(() => {
     const next = getNextIndex(
       indexRef.current,
-      SONGS.length,
+      songsRef.current.length,
       shuffleRef.current,
       historyRef.current,
     );
     goTo(next);
   }, [goTo]);
 
-  /* Load YouTube IFrame API once */
+  // Keep mirror refs up-to-date every render
+  goNextRef.current = goNext;
+  goToRef.current = goTo;
+  startTickRef.current = startTick;
+  stopTickRef.current = stopTick;
+
+  /* Load YouTube IFrame API — runs ONCE. Mirror refs handle stale closures. */
   useEffect(() => {
+    // Create container outside React's DOM so React never unmounts/replaces it.
+    // YouTube replaces the div with an <iframe>; React must never see that swap.
+    const container = document.createElement("div");
+    container.style.cssText =
+      "position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;z-index:-1;";
+    document.body.appendChild(container);
+    iframeContainerRef.current = container;
+
     const init = () => {
-      if (!iframeContainerRef.current) return;
-      playerRef.current = new window.YT.Player(iframeContainerRef.current, {
+      playerRef.current = new window.YT.Player(container, {
         height: "1",
         width: "1",
-        videoId: SONGS[0].id,
+        videoId: _opener.id,
         playerVars: {
           autoplay: 0,
           controls: 0,
@@ -472,20 +499,45 @@ export default function MusicPlayer() {
           onReady: () => {
             setReady(true);
             playerRef.current?.setVolume(70);
-            // Don't call playVideo() here — wait for user gesture via overlay
+            playerRef.current?.cueVideoById(_opener.id);
+            if (pendingPlayRef.current) {
+              pendingPlayRef.current = false;
+              playerRef.current?.playVideo();
+            }
           },
           onStateChange: (e) => {
             const { PLAYING, PAUSED, ENDED } = window.YT.PlayerState;
             if (e.data === PLAYING) {
               setPlaying(true);
-              startTick();
+              startTickRef.current();
             } else if (e.data === PAUSED) {
               setPlaying(false);
-              stopTick();
+              stopTickRef.current();
             } else if (e.data === ENDED) {
-              setPlaying(false);
-              stopTick();
-              goNext();
+              if (
+                !featuredAddedRef.current &&
+                indexRef.current === 0 &&
+                _restFeat.length > 0
+              ) {
+                // Opener ended: insert remaining featured songs synchronously
+                // then go to index 1. Never shuffle here — songs state hasn't
+                // re-rendered yet so random indices > old length = undefined.
+                featuredAddedRef.current = true;
+                const newSongs = [
+                  songsRef.current[0],
+                  ..._restFeat,
+                  ...songsRef.current.slice(1),
+                ];
+                songsRef.current = newSongs; // immediate: goToRef reads this
+                setSongs(newSongs); // async: updates playlist UI
+                setPlaying(false);
+                stopTickRef.current();
+                goToRef.current(1);
+              } else {
+                setPlaying(false);
+                stopTickRef.current();
+                goNextRef.current();
+              }
             }
           },
         },
@@ -502,8 +554,14 @@ export default function MusicPlayer() {
         document.head.appendChild(tag);
       }
     }
-    return stopTick;
-  }, [startTick, stopTick, goNext]);
+
+    return () => {
+      stopTickRef.current();
+      try {
+        document.body.removeChild(container);
+      } catch (_) {}
+    };
+  }, []); // empty deps: runs once
 
   /* Sync volume to player whenever it changes */
   useEffect(() => {
@@ -555,16 +613,22 @@ export default function MusicPlayer() {
     }
   };
 
-  /* Called by the tap-to-start overlay — satisfies browser autoplay policy */
+  /* Called by the tap-to-start overlay — satisfies browser autoplay policy.
+     playVideo() MUST be called synchronously inside the click handler.
+     Any delay (setTimeout etc.) breaks the user gesture chain and the
+     browser's autoplay policy will immediately pause the video.          */
   const startAutoplay = () => {
     setAutoplayPending(false);
-    if (playerRef.current) {
+    if (playerRef.current && ready) {
       playerRef.current.setVolume(muted ? 0 : volume);
       playerRef.current.playVideo();
+    } else {
+      // Player still loading — onReady will call playVideo once it's ready
+      pendingPlayRef.current = true;
     }
   };
 
-  const song = SONGS[index];
+  const song = songs[index];
   const displayVolume = muted ? 0 : volume;
 
   /* ─── Global keyframes + volume slider CSS ───────────────────────── */
@@ -623,26 +687,11 @@ export default function MusicPlayer() {
   `;
 
   /* ─── Hidden iframe always present ──────────────────────────────── */
-  const hiddenIframe = (
-    <div
-      ref={iframeContainerRef}
-      style={{
-        position: "absolute",
-        bottom: 0,
-        right: 0,
-        opacity: 0,
-        pointerEvents: "none",
-        width: 1,
-        height: 1,
-        overflow: "hidden",
-      }}
-    />
-  );
+  /* Pushed far off-screen so YouTube's minimum render size never shows */
 
-  /* ─── Autoplay overlay ───────────────────────────────────────────── */
+  /*  Autoplay overlay  */
   const autoplayOverlay = autoplayPending && (
     <div
-      onClick={startAutoplay}
       style={{
         position: "fixed",
         inset: 0,
@@ -659,6 +708,7 @@ export default function MusicPlayer() {
     >
       {/* Pulsing play button */}
       <div
+        onClick={startAutoplay}
         style={{
           width: "72px",
           height: "72px",
@@ -698,14 +748,98 @@ export default function MusicPlayer() {
             letterSpacing: "0.12em",
           }}
         >
-          ♥ {SONGS[0].title} — {SONGS[0].artist}
+          ♥ {_opener.title} — {_opener.artist}
         </div>
       </div>
     </div>
   );
+  /* ─── Mobile bottom bar ─────────────────────────────────────────── */
+  if (mobile) {
+    return (
+      <>
+        {autoplayOverlay}
+        <style>{keyframes}</style>
+        <div
+          style={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1000,
+            background: "rgba(26,10,15,0.96)",
+            borderTop: "1px solid rgba(200,151,58,0.25)",
+            backdropFilter: "blur(24px)",
+            padding: "0.5rem 1rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+          }}
+        >
+          {/* Vinyl disc */}
+          <VinylDisc playing={playing} size={36} />
 
-  /* ─── Collapsed pill ─────────────────────────────────────────────── */
-  if (collapsed) {
+          {/* Song info */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: "0.85rem",
+                color: "#fff5f0",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {song.title}
+            </div>
+            <div
+              style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: "0.72rem",
+                color: "rgba(200,151,58,0.85)",
+                fontStyle: "italic",
+              }}
+            >
+              {song.artist}
+            </div>
+          </div>
+
+          {/* Prev */}
+          <button
+            style={{ ...S.iconBtn, color: "rgba(255,245,240,0.7)" }}
+            onClick={goPrev}
+          >
+            <Prev />
+          </button>
+
+          {/* Play/Pause */}
+          <button
+            style={{
+              ...S.playBtn,
+              width: "36px",
+              height: "36px",
+              opacity: ready ? 1 : 0.5,
+            }}
+            onClick={togglePlay}
+            disabled={!ready}
+          >
+            {playing ? <PauseIcon /> : <PlayIcon />}
+          </button>
+
+          {/* Next */}
+          <button
+            style={{ ...S.iconBtn, color: "rgba(255,245,240,0.7)" }}
+            onClick={goNext}
+          >
+            <Next />
+          </button>
+        </div>
+      </>
+    );
+  }
+
+  /* ─── Collapsed pill (desktop only) ─────────────────────────────── */
+  if (collapsed && !mobile) {
     return (
       <>
         {autoplayOverlay}
@@ -756,13 +890,243 @@ export default function MusicPlayer() {
               {playing ? <PauseIcon /> : <PlayIcon />}
             </button>
           </div>
-          {hiddenIframe}
         </div>
       </>
     );
   }
 
-  /* ─── Full player ────────────────────────────────────────────────── */
+  /* ─── Mobile: slim horizontal bar pinned to the bottom ─────────── */
+  if (mobile) {
+    return (
+      <>
+        {autoplayOverlay}
+        <style>{keyframes}</style>
+
+        {/* Playlist drawer — slides up above the bar */}
+        {showPlaylist && (
+          <div
+            style={{
+              position: "fixed",
+              bottom: "64px" /* height of the slim bar */,
+              left: 0,
+              right: 0,
+              maxHeight: "45vh",
+              overflowY: "auto",
+              zIndex: 1000,
+              background: "rgba(14,5,10,0.98)",
+              borderTop: "1px solid rgba(200,151,58,0.2)",
+              borderBottom: "1px solid rgba(200,151,58,0.1)",
+              backdropFilter: "blur(24px)",
+            }}
+          >
+            <div style={S.playlistTitle}>♪ Playlist</div>
+            {songs.map((s, i) => (
+              <div
+                key={`${s.id}-${i}`}
+                style={{
+                  ...S.playlistItem,
+                  background:
+                    i === index ? "rgba(232,55,90,0.12)" : "transparent",
+                }}
+                onClick={() => {
+                  goTo(i);
+                  setShowPlaylist(false);
+                }}
+              >
+                <span
+                  style={{
+                    ...S.playlistNum,
+                    color: i === index ? "#e8375a" : "rgba(255,245,240,0.3)",
+                    animation:
+                      i === index && playing
+                        ? "mpPulse 1.5s ease-in-out infinite"
+                        : "none",
+                  }}
+                >
+                  {i === index && playing ? "♪" : i + 1}
+                </span>
+                <div style={S.playlistInfo}>
+                  <div
+                    style={{
+                      ...S.playlistSong,
+                      color: i === index ? "#fff5f0" : "rgba(255,245,240,0.75)",
+                    }}
+                  >
+                    {s.title}
+                  </div>
+                  <div style={S.playlistArtist}>{s.artist}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Slim bar */}
+        <div
+          style={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1015,
+            background: "rgba(14,5,10,0.97)",
+            borderTop: "1px solid rgba(200,151,58,0.28)",
+            backdropFilter: "blur(28px)",
+            boxShadow: "0 -2px 20px rgba(0,0,0,0.6)",
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          }}
+        >
+          {/* Progress strip — clickable */}
+          <div
+            style={{
+              width: "100%",
+              height: "3px",
+              background: "rgba(255,255,255,0.08)",
+              position: "relative",
+              cursor: "pointer",
+              flexShrink: 0,
+            }}
+            onClick={seek}
+          >
+            {/* fill */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                height: "100%",
+                width: `${progress * 100}%`,
+                background: "linear-gradient(90deg,#e8375a,#c8973a)",
+                borderRadius: "0 999px 999px 0",
+              }}
+            />
+            {/* thumb dot */}
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: `${progress * 100}%`,
+                width: "9px",
+                height: "9px",
+                background: "#fff5f0",
+                borderRadius: "50%",
+                transform: "translate(-50%, -50%)",
+                boxShadow: "0 0 6px rgba(232,55,90,0.8)",
+              }}
+            />
+          </div>
+
+          {/* Main row */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "0.5rem 0.9rem",
+              gap: "0.65rem",
+              height: "61px",
+            }}
+          >
+            {/* Spinning vinyl */}
+            <VinylDisc playing={playing} size={38} />
+
+            {/* Song info — takes all remaining space */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  color: "#fff5f0",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  fontFamily: "'Playfair Display', serif",
+                  letterSpacing: "0.01em",
+                  lineHeight: 1.2,
+                }}
+              >
+                {song.title}
+              </div>
+              <div
+                style={{
+                  fontSize: "0.7rem",
+                  color: "rgba(200,151,58,0.85)",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  fontStyle: "italic",
+                  fontFamily: "'Cormorant Garamond', serif",
+                  marginTop: "1px",
+                }}
+              >
+                {song.artist}
+              </div>
+            </div>
+
+            {/* Controls — right-aligned, compact */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0rem",
+                flexShrink: 0,
+              }}
+            >
+              <button
+                style={{
+                  ...S.iconBtn,
+                  color: "rgba(255,245,240,0.55)",
+                  padding: "7px",
+                }}
+                onClick={goPrev}
+              >
+                <Prev />
+              </button>
+
+              <button
+                style={{
+                  ...S.playBtn,
+                  width: "38px",
+                  height: "38px",
+                  boxShadow: playing
+                    ? "0 3px 14px rgba(232,55,90,0.7)"
+                    : "0 2px 8px rgba(232,55,90,0.35)",
+                  opacity: ready ? 1 : 0.5,
+                }}
+                onClick={togglePlay}
+                disabled={!ready}
+              >
+                {playing ? <PauseIcon /> : <PlayIcon />}
+              </button>
+
+              <button
+                style={{
+                  ...S.iconBtn,
+                  color: "rgba(255,245,240,0.55)",
+                  padding: "7px",
+                }}
+                onClick={goNext}
+              >
+                <Next />
+              </button>
+
+              <button
+                style={{
+                  ...S.iconBtn,
+                  color: showPlaylist ? "#c8973a" : "rgba(255,245,240,0.3)",
+                  padding: "7px",
+                }}
+                onClick={() => setShowPlaylist((v) => !v)}
+              >
+                <ListIcon />
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  /* ─── Desktop: original floating card ───────────────────────────── */
   return (
     <>
       {autoplayOverlay}
@@ -773,7 +1137,7 @@ export default function MusicPlayer() {
         {showPlaylist && (
           <div style={S.playlist}>
             <div style={S.playlistTitle}>♪ Playlist</div>
-            {SONGS.map((s, i) => (
+            {songs.map((s, i) => (
               <div
                 key={`${s.id}-${i}`}
                 style={{
@@ -857,7 +1221,7 @@ export default function MusicPlayer() {
 
           {/* Disc + meta */}
           <div style={S.topRow}>
-            <VinylDisc playing={playing} size={mobile ? 44 : 56} />
+            <VinylDisc playing={playing} size={56} />
             <div style={S.meta}>
               <div style={S.title}>{song.title}</div>
               <div style={S.artist}>{song.artist}</div>
@@ -1011,11 +1375,9 @@ export default function MusicPlayer() {
               letterSpacing: "0.12em",
             }}
           >
-            {index + 1} / {SONGS.length}
+            {index + 1} / {songs.length}
           </div>
         </div>
-
-        {hiddenIframe}
       </div>
     </>
   );
