@@ -29,6 +29,7 @@ declare global {
   interface YTPlayer {
     playVideo(): void;
     pauseVideo(): void;
+    unMute(): void;
     loadVideoById(id: string): void;
     cueVideoById(id: string): void;
     seekTo(s: number, a: boolean): void;
@@ -354,7 +355,6 @@ export default function MusicPlayer() {
   const [duration, setDuration] = useState(0);
   const [current, setCurrent] = useState(0);
   const [shuffle, setShuffle] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [autoplayPending, setAutoplayPending] = useState(true);
   const [volume, setVolume] = useState(70);
@@ -462,7 +462,6 @@ export default function MusicPlayer() {
           onReady: () => {
             setReady(true);
             playerRef.current?.setVolume(70);
-            playerRef.current?.cueVideoById(_opener.id);
             if (pendingPlayRef.current) {
               pendingPlayRef.current = false;
               playerRef.current?.playVideo();
@@ -571,7 +570,7 @@ export default function MusicPlayer() {
   const startAutoplay = () => {
     setAutoplayPending(false);
     if (playerRef.current && ready) {
-      playerRef.current.setVolume(muted ? 0 : volume);
+      playerRef.current.setVolume(volume);
       playerRef.current.playVideo();
     } else {
       pendingPlayRef.current = true;
@@ -727,7 +726,7 @@ export default function MusicPlayer() {
       <style>{css}</style>
 
       {/* ── Tap-to-play overlay: entire div is clickable on mobile ── */}
-      {autoplayPending && !collapsed && (
+      {autoplayPending && (
         <div
           onClick={startAutoplay}
           style={{
@@ -911,58 +910,8 @@ export default function MusicPlayer() {
         </>
       )}
 
-      {/* ══ DESKTOP COLLAPSED: pill ══ */}
-      {!mobile && collapsed && (
-        <div style={S.wrap}>
-          <div
-            style={{
-              ...S.pill,
-              borderColor: playing
-                ? "rgba(232,55,90,0.5)"
-                : "rgba(200,151,58,0.35)",
-              boxShadow: playing
-                ? "0 4px 20px rgba(232,55,90,0.3)"
-                : "0 4px 20px rgba(232,55,90,0.1)",
-            }}
-            onClick={() => setCollapsed(false)}
-          >
-            <div
-              style={{
-                color: "#e8375a",
-                display: "flex",
-                animation: playing ? "mpSpinDisc 4s linear infinite" : "none",
-              }}
-            >
-              <MusicNote />
-            </div>
-            <span
-              style={{
-                fontSize: "0.8rem",
-                color: "#fff5f0",
-                maxWidth: "120px",
-                overflow: "hidden",
-                whiteSpace: "nowrap",
-                textOverflow: "ellipsis",
-                fontFamily: "'Cormorant Garamond',serif",
-              }}
-            >
-              {song.title}
-            </span>
-            <button
-              style={{ ...S.iconBtn, color: "#e8375a" }}
-              onClick={(e) => {
-                e.stopPropagation();
-                togglePlay();
-              }}
-            >
-              {playing ? <PauseIcon /> : <PlayIcon />}
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* ══ DESKTOP FULL: floating card ══ */}
-      {!mobile && !collapsed && (
+      {!mobile && (
         <div style={S.wrap}>
           {showPlaylist && (
             <div style={S.playlist} className="mp-pl">
@@ -989,12 +938,6 @@ export default function MusicPlayer() {
               >
                 ♥ Now Playing
               </span>
-              <button
-                style={{ ...S.iconBtn, color: "rgba(255,245,240,0.3)" }}
-                onClick={() => setCollapsed(true)}
-              >
-                <MinimiseIcon />
-              </button>
             </div>
             <div style={S.topRow}>
               <VinylDisc playing={playing} size={56} />
