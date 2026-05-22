@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { animate } from "animejs";
-
+import { useNavigate } from "react-router-dom";
 const MESSAGES = [
   "Will you be my girlfriend? 💕",
   "Are you sure? 🥺",
@@ -14,6 +14,33 @@ const MESSAGES = [
   "The No button has left the chat 🤭",
 ];
 
+function CountdownRedirect() {
+  const [count, setCount] = useState(3);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (count === 0) {
+      navigate("/yes");
+      return;
+    }
+    const timer = setTimeout(() => setCount((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [count, navigate]);
+
+  return (
+    <p
+      style={{
+        fontFamily: "'Cormorant Garamond', serif",
+        fontSize: "1rem",
+        color: "rgba(255,245,240,0.5)",
+        fontStyle: "italic",
+        zIndex: 1,
+      }}
+    >
+      Redirecting in {count}...
+    </p>
+  );
+}
 export default function Envelope() {
   const envelopeRef = useRef<HTMLDivElement>(null);
   const flapRef = useRef<SVGGElement>(null);
@@ -31,7 +58,7 @@ export default function Envelope() {
   const [noPos, setNoPos] = useState({ x: 200, y: 200 });
 
   const message = MESSAGES[Math.min(noAttempts, MESSAGES.length - 1)];
-
+  const navigate = useNavigate();
   // Floating loop
   useEffect(() => {
     if (!envelopeRef.current) return;
@@ -133,14 +160,58 @@ export default function Envelope() {
             justifyContent: "center",
             textAlign: "center",
             gap: "1.5rem",
+            overflow: "hidden",
           }}
         >
-          <p style={{ fontSize: "4rem" }}>🎉💕🌹</p>
+          {/* Confetti pieces */}
+          {[...Array(30)].map((_, i) => (
+            <div
+              key={i}
+              style={{
+                position: "absolute",
+                bottom: "-20px",
+                left: `${Math.random() * 100}%`,
+                width: `${8 + Math.random() * 8}px`,
+                height: `${8 + Math.random() * 8}px`,
+                borderRadius: Math.random() > 0.5 ? "50%" : "2px",
+                background: [
+                  "#e8375a",
+                  "#c8973a",
+                  "#ff6b8a",
+                  "#fff5f0",
+                  "#f48fb1",
+                  "#ffcc00",
+                ][Math.floor(Math.random() * 6)],
+                animation: `floatUp ${2 + Math.random() * 3}s ease-in ${Math.random() * 2}s infinite`,
+                opacity: 0,
+              }}
+            />
+          ))}
+
+          {/* Balloons */}
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={`b${i}`}
+              style={{
+                position: "absolute",
+                bottom: "-100px",
+                left: `${10 + i * 12}%`,
+                fontSize: "3rem",
+                animation: `floatUp ${3 + Math.random() * 2}s ease-in ${Math.random() * 1.5}s infinite`,
+                opacity: 0,
+              }}
+            >
+              {["🎈", "🎀", "💕", "🌹", "✨", "🎊", "💝", "🎉"][i]}
+            </div>
+          ))}
+
+          <p style={{ fontSize: "4rem", zIndex: 1 }}>🎉💕🌹</p>
           <p
             style={{
               fontFamily: "'Playfair Display', serif",
               fontSize: "clamp(2rem, 5vw, 3.5rem)",
               color: "#fff5f0",
+              zIndex: 1,
             }}
           >
             She said Yes! 💕
@@ -151,10 +222,14 @@ export default function Envelope() {
               fontSize: "clamp(1rem, 2vw, 1.3rem)",
               color: "#c8973a",
               fontStyle: "italic",
+              zIndex: 1,
             }}
           >
             I knew you would, my love 🌹
           </p>
+
+          {/* Countdown */}
+          <CountdownRedirect />
         </div>
       )}
 

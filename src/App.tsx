@@ -3,7 +3,7 @@ import Envelope from "./components/Envelope";
 import HeartScene from "./components/HeartScene";
 import HeroSection from "./components/HeroSection";
 import MusicPlayer from "./components/MusicPlayer";
-
+import YesPage from "./pages/YesPage";
 // Home Page
 function HomePage() {
   return (
@@ -21,6 +21,7 @@ function App() {
       <MusicPlayer />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/yes" element={<YesPage />} />
         {/* More pages to be added here soon */}
       </Routes>
     </BrowserRouter>

@@ -41,7 +41,7 @@ declare global {
   }
 }
 
-/* ── Queue setup ─────────────────────────────────────────────────────────
+/*   Queue setup                              
    One random featured song opens. Rest splice in after opener ends.    */
 const _openerIdx = Math.floor(Math.random() * FEATURED_SONGS.length);
 const _opener = FEATURED_SONGS[_openerIdx];
@@ -264,16 +264,16 @@ const ListIcon = () => (
     <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
   </svg>
 );
-const MusicNote = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-  </svg>
-);
-const MinimiseIcon = () => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M19 13H5v-2h14v2z" />
-  </svg>
-);
+// const MusicNote = () => (
+//   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+//     <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+//   </svg>
+// );
+// const MinimiseIcon = () => (
+//   <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+//     <path d="M19 13H5v-2h14v2z" />
+//   </svg>
+// );
 const VolumeIcon = ({ muted, volume }: { muted: boolean; volume: number }) => {
   if (muted || volume === 0)
     return (
@@ -437,7 +437,7 @@ export default function MusicPlayer() {
   startTickRef.current = startTick;
   stopTickRef.current = stopTick;
 
-  /* ── YouTube: imperative container, empty deps, mirror refs ── */
+  /*   YouTube: imperative container, empty deps, mirror refs   */
   useEffect(() => {
     const container = document.createElement("div");
     container.style.cssText =
@@ -566,7 +566,7 @@ export default function MusicPlayer() {
     }
   };
 
-  /* ── startAutoplay: MUST call playVideo() synchronously in click handler ── */
+  /*   startAutoplay: MUST call playVideo() synchronously in click handler   */
   const startAutoplay = () => {
     setAutoplayPending(false);
     if (playerRef.current && ready) {
@@ -725,7 +725,7 @@ export default function MusicPlayer() {
     <>
       <style>{css}</style>
 
-      {/* ── Tap-to-play overlay: entire div is clickable on mobile ── */}
+      {/*   Tap-to-play overlay: entire div is clickable on mobile   */}
       {autoplayPending && (
         <div
           onClick={startAutoplay}

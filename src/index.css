@@ -24,3 +24,13 @@ body {
   color: #fff5f0;
   font-family: "Cormorant Garamond", serif;
 }
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-110vh) rotate(720deg);
+    opacity: 0;
+  }
+}
