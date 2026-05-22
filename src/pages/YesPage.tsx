@@ -6,7 +6,7 @@ import LoveTimer from "./LoveTimer";
 export default function YesPage() {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
-
+  const emojiRef = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     // Animate the title letters
 
@@ -36,6 +36,14 @@ export default function YesPage() {
           ease: "outExpo",
         });
       }
+      if (emojiRef.current)
+        animate(emojiRef.current, {
+          opacity: [0, 1],
+          translateY: [30, 0],
+          delay: 1800,
+          duration: 800,
+          ease: "outExpo",
+        });
     }
   }, []);
 
@@ -87,6 +95,7 @@ export default function YesPage() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              flexWrap: "wrap",
               gap: "0.5rem",
             }}
           >
@@ -94,7 +103,7 @@ export default function YesPage() {
               ref={titleRef}
               style={{
                 fontFamily: "'Playfair Display', serif",
-                fontSize: "clamp(2.5rem, 6vw, 5rem)",
+                fontSize: "clamp(1.5rem, 6vw, 4.5rem)",
                 color: "#fff5f0",
                 lineHeight: 1.1,
                 marginBottom: "1rem",
@@ -102,7 +111,19 @@ export default function YesPage() {
             >
               My Girlfriend
             </h1>
-            <span style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)" }}>🌹</span>
+            {/* Emoji animated separately */}
+            <span
+              ref={emojiRef}
+              style={{
+                fontSize: "clamp(1.8em, 4vw, 4.5rem)",
+                opacity: 0,
+                display: "inline-block",
+                wordBreak: "keep-all",
+                whiteSpace: "nowrap",
+              }}
+            >
+              💝
+            </span>
           </div>
 
           <p
