@@ -26,13 +26,16 @@ export default function YesPage() {
         ease: "outExpo",
         duration: 800,
       });
-      animate(subtitleRef.current, {
-        opacity: [0, 1],
-        translateY: [20, 0],
-        delay: 1200,
-        duration: 800,
-        ease: "outExpo",
-      });
+
+      if (subtitleRef.current) {
+        animate(subtitleRef.current, {
+          opacity: [0, 1],
+          translateY: [20, 0],
+          delay: 1200,
+          duration: 800,
+          ease: "outExpo",
+        });
+      }
     }
   }, []);
 

@@ -15,8 +15,8 @@ function getElapsed() {
 }
 
 function TimerUnit({ value, label }: { value: number; label: string }) {
-  const tensRef = useRef<HTMLSpanElement>(null);
-  const onesRef = useRef<HTMLSpanElement>(null);
+  const tensRef = useRef<HTMLSpanElement | null>(null);
+  const onesRef = useRef<HTMLSpanElement | null>(null);
   const prevValue = useRef(-1);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ function TimerUnit({ value, label }: { value: number; label: string }) {
     prevValue.current = value;
 
     const animateDigit = (
-      ref: React.RefObject<HTMLSpanElement>,
+      ref: React.RefObject<HTMLSpanElement | null>,
       newVal: number,
       changed: boolean,
     ) => {
@@ -158,13 +158,15 @@ export default function LoveTimer() {
     if (!hasAnimated.current && wrapRef.current) {
       hasAnimated.current = true;
 
-      animate(labelRef.current, {
-        opacity: [0, 1],
-        translateY: [20, 0],
-        duration: 700,
-        ease: "outExpo",
-        delay: 200,
-      });
+      if (labelRef.current) {
+        animate(labelRef.current, {
+          opacity: [0, 1],
+          translateY: [20, 0],
+          duration: 700,
+          ease: "outExpo",
+          delay: 200,
+        });
+      }
 
       animate(wrapRef.current.querySelectorAll(".timer-unit"), {
         opacity: [0, 1],
@@ -175,13 +177,15 @@ export default function LoveTimer() {
         ease: "outExpo",
       });
 
-      animate(captionRef.current, {
-        opacity: [0, 1],
-        translateY: [20, 0],
-        duration: 700,
-        ease: "outExpo",
-        delay: 900,
-      });
+      if (captionRef.current) {
+        animate(captionRef.current, {
+          opacity: [0, 1],
+          translateY: [20, 0],
+          duration: 700,
+          ease: "outExpo",
+          delay: 900,
+        });
+      }
     }
   }, []);
 

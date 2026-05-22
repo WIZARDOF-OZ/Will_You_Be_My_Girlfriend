@@ -58,7 +58,6 @@ export default function Envelope() {
   const [noPos, setNoPos] = useState({ x: 200, y: 200 });
 
   const message = MESSAGES[Math.min(noAttempts, MESSAGES.length - 1)];
-  const navigate = useNavigate();
   // Floating loop
   useEffect(() => {
     if (!envelopeRef.current) return;
