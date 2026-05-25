@@ -46,7 +46,7 @@ function TimerUnit({ value, label }: { value: number; label: string }) {
       animate(ref.current, {
         translateY: [0, -20],
         opacity: [1, 0],
-        duration: 400,
+        duration: 200,
         ease: "inExpo",
         onComplete: () => {
           if (ref.current) {
