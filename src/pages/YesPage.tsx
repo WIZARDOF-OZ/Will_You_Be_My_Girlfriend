@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { animate, stagger } from "animejs";
 import HeartScene from "../components/HeartScene";
 import LoveTimer from "./LoveTimer";
-
+import LoveBook from "../components/LoveBook";
 export default function YesPage() {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
@@ -143,19 +143,9 @@ export default function YesPage() {
         {/* Love Timer */}
         <LoveTimer />
 
-        {/* Book section coming soon */}
-        <div
-          style={{
-            marginTop: "2rem",
-            fontFamily: "'Cormorant Garamond', serif",
-            color: "rgba(26, 19, 6, 0.5)",
-            fontStyle: "italic",
-            fontSize: "1rem",
-            letterSpacing: "0.1em",
-          }}
-        >
-          — more coming soon —
-        </div>
+        {/* Book Section */}
+
+        <LoveBook />
       </div>
     </div>
   );
