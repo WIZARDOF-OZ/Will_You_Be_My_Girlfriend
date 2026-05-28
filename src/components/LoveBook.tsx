@@ -82,7 +82,7 @@ export default function LoveBook() {
   const candleGlowRef = useRef<HTMLDivElement>(null);
   const bookRef = useRef<HTMLDivElement>(null);
   const pageContentRef = useRef<HTMLDivElement>(null);
-  const flipLayerRef = useRef<HTMLDivElement>(null);
+  // const flipLayerRef = useRef<HTMLDivElement>(null);
 
   // Candle flicker
   useEffect(() => {
@@ -106,9 +106,9 @@ export default function LoveBook() {
     });
   }, []);
 
-  // Hide hint after 3s
+  // Hide hint after 5s
   useEffect(() => {
-    const t = setTimeout(() => setShowHint(false), 3000);
+    const t = setTimeout(() => setShowHint(false), 5000);
     return () => clearTimeout(t);
   }, []);
 
