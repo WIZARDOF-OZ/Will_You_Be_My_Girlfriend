@@ -1,5 +1,10 @@
 export const FEATURED_SONGS = [
   {
+    id: "SBOwcGnwuKM",
+    title: "Udi Udi",
+    artist: "Aneesh, Sarkar, Henry",
+  },
+  {
     id: "fukGbiPuBjU",
     title: "I Wanna Be Yours",
     artist: "Arctic Monkeys",
