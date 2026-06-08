@@ -284,7 +284,7 @@ export default function LoveBook() {
         )}
 
         {!isOpen ? (
-          /* ── CLOSED BOOK ── */
+          /*   CLOSED BOOK   */
           <div
             onClick={openBook}
             style={{
@@ -407,7 +407,7 @@ export default function LoveBook() {
             </span>
           </div>
         ) : (
-          /* ── OPEN BOOK ── */
+          /*   OPEN BOOK   */
           <div
             style={{
               width: "min(580px, 96vw)",
