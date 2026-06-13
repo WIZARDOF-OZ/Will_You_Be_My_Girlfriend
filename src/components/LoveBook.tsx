@@ -73,7 +73,7 @@ export default function LoveBook() {
   const [isOpening, setIsOpening] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
-  const [flipStage, setFlipStage] = useState<"idle" | "out" | "in">("idle");
+  const [setFlipStage] = useState<"idle" | "out" | "in">("idle");
 
   const candleFlameRef = useRef<HTMLDivElement>(null);
   const candleGlowRef = useRef<HTMLDivElement>(null);
