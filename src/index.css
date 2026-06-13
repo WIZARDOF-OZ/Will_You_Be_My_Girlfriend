@@ -35,3 +35,20 @@ body {
     opacity: 0;
   }
 }
+/* Book scrollbar */
+.book-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.book-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.book-content::-webkit-scrollbar-thumb {
+  background: rgba(124, 45, 18, 0.3);
+  border-radius: 999px;
+}
+
+.book-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 45, 18, 0.6);
+}
