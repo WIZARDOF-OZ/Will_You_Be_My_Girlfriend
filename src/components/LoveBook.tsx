@@ -73,7 +73,6 @@ export default function LoveBook() {
   const [isOpening, setIsOpening] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
-  const [setFlipStage] = useState<"idle" | "out" | "in">("idle");
 
   const candleFlameRef = useRef<HTMLDivElement>(null);
   const candleGlowRef = useRef<HTMLDivElement>(null);
@@ -127,7 +126,6 @@ export default function LoveBook() {
     if (!flipPageRef.current) return;
 
     setIsFlipping(true);
-    setFlipStage("out");
 
     // Slide + fade out
     animate(flipPageRef.current, {
@@ -137,7 +135,6 @@ export default function LoveBook() {
       ease: "inCubic",
       onComplete: () => {
         setCurrentPage((p) => (direction === "next" ? p + 1 : p - 1));
-        setFlipStage("in");
 
         if (flipPageRef.current) {
           animate(flipPageRef.current, {
@@ -147,7 +144,6 @@ export default function LoveBook() {
             ease: "outCubic",
             onComplete: () => {
               setIsFlipping(false);
-              setFlipStage("idle");
             },
           });
         }
