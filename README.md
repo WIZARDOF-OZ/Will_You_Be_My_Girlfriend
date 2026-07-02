@@ -156,7 +156,7 @@ const START_DATE = new Date("2025-05-14T00:00:00");
 
 ### Envelope messages
 
-The escalating _No_ button copy is in `src/components/Envelope.tsx` — update the `MESSAGES` array:
+The escalating _No_ button copy is in `src/components/Envelope.tsx` - update the `MESSAGES` array:
 
 ```ts
 const MESSAGES = [
@@ -275,7 +275,7 @@ Works best in modern browsers with WebGL support (Chrome, Firefox, Safari, Edge)
 
 ## License
 
-This is a personal project. Feel free to fork and adapt it for your own story — just swap in your memories, songs, and dates.
+This is a personal project. Feel free to fork and adapt it for your own story - just swap in your memories, songs, and dates.
 
 ---
 
