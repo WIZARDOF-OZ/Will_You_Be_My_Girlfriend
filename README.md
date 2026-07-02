@@ -114,7 +114,7 @@ will_you_be_my_girlfriend/
 ### Install
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/WIZARDOF-OZ/Will_You_Be_My_Girlfriend.git
 cd will_you_be_my_girlfriend
 npm install
 ```
