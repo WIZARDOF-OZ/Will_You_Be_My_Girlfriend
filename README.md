@@ -284,6 +284,11 @@ The project includes a `vercel.json` with SPA rewrites so client-side routes lik
    - **Output directory:** `dist`
 4. Deploy.
 
+### Security Headers & CSP
+
+The `vercel.json` file includes strict security headers and a Content Security Policy (CSP) designed to protect the app. By default, the CSP only allows media and scripts from `youtube.com` (for the music player). 
+If you decide to customize the app and embed a different music service (like Spotify, SoundCloud, or Apple Music), make sure to update the `frame-src` and `script-src` rules in `vercel.json` to whitelist your new provider, otherwise the browser will block it!
+
 Other static hosts (Netlify, GitHub Pages with a rewrite rule, Cloudflare Pages) work as long as all routes fall back to `index.html`.
 
 ---
