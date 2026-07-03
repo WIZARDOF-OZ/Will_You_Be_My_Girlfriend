@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import { animate } from "animejs";
 import { useNavigate } from "react-router-dom";
 const MESSAGES = [
@@ -90,7 +90,9 @@ export default function Envelope() {
       alternate: true,
     });
 
-    return () => floatAnim.pause();
+    return () => {
+      floatAnim.pause();
+    };
   }, []);
 
   const getRandomPos = () => {
