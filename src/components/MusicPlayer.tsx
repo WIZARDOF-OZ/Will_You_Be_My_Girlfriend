@@ -340,6 +340,164 @@ const fmt = (s: number) => {
     .padStart(2, "0")}`;
 };
 
+const ProgressBar = ({
+  progress,
+  onClick,
+}: {
+  progress: number;
+  onClick: React.MouseEventHandler<HTMLDivElement>;
+}) => (
+  <div
+    style={{
+      width: "100%",
+      height: "3px",
+      background: "rgba(255,255,255,0.08)",
+      position: "relative",
+      cursor: "pointer",
+    }}
+    onClick={onClick}
+  >
+    <div
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        height: "100%",
+        width: `${progress * 100}%`,
+        background: "linear-gradient(90deg,#e8375a,#c8973a)",
+        borderRadius: "0 999px 999px 0",
+        transition: "width 0.25s linear",
+      }}
+    />
+    <div
+      style={{
+        position: "absolute",
+        top: "50%",
+        left: `${progress * 100}%`,
+        width: "9px",
+        height: "9px",
+        background: "#fff5f0",
+        borderRadius: "50%",
+        transform: "translate(-50%,-50%)",
+        boxShadow: "0 0 6px rgba(232,55,90,0.8)",
+        transition: "left 0.25s linear",
+      }}
+    />
+  </div>
+);
+
+const VolumeRow = ({
+  compact,
+  muted,
+  volume,
+  dv,
+  toggleMute,
+  handleVolumeChange,
+}: {
+  compact?: boolean;
+  muted: boolean;
+  volume: number;
+  dv: number;
+  toggleMute: () => void;
+  handleVolumeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) => (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: compact ? "0.4rem" : "0.5rem",
+      marginTop: compact ? 0 : "0.85rem",
+    }}
+  >
+    <button
+      style={{
+        ...S.iconBtn,
+        padding: 0,
+        flexShrink: 0,
+        color: muted ? "rgba(255,245,240,0.3)" : "rgba(255,245,240,0.55)",
+      }}
+      onClick={toggleMute}
+    >
+      <VolumeIcon muted={muted} volume={volume} />
+    </button>
+    <input
+      type="range"
+      min={0}
+      max={100}
+      step={1}
+      value={dv}
+      onChange={handleVolumeChange}
+      className="mp-vol"
+      aria-label="Volume"
+    />
+  </div>
+);
+
+const PlaylistItems = ({
+  songs,
+  index,
+  playing,
+  goTo,
+  onSelect,
+}: {
+  songs: { id: string; title: string; artist: string }[];
+  index: number;
+  playing: boolean;
+  goTo: (i: number) => void;
+  onSelect: () => void;
+}) => (
+  <>
+    <div style={S.pTitle}>♪ Playlist</div>
+    {songs.map((s, i) => (
+      <div
+        key={`${s.id}-${i}`}
+        style={{
+          ...S.pItem,
+          background: i === index ? "rgba(232,55,90,0.12)" : "transparent",
+        }}
+        onClick={() => {
+          goTo(i);
+          onSelect();
+        }}
+        onMouseEnter={(e) => {
+          if (i !== index)
+            (e.currentTarget as HTMLDivElement).style.background =
+              "rgba(255,255,255,0.04)";
+        }}
+        onMouseLeave={(e) => {
+          if (i !== index)
+            (e.currentTarget as HTMLDivElement).style.background =
+              "transparent";
+        }}
+      >
+        <span
+          style={{
+            ...S.pNum,
+            color: i === index ? "#e8375a" : "rgba(255,245,240,0.3)",
+            animation:
+              i === index && playing
+                ? "mpPulse 1.5s ease-in-out infinite"
+                : "none",
+          }}
+        >
+          {i === index && playing ? "♪" : i + 1}
+        </span>
+        <div style={S.pInfo}>
+          <div
+            style={{
+              ...S.pSong,
+              color: i === index ? "#fff5f0" : "rgba(255,245,240,0.75)",
+            }}
+          >
+            {s.title}
+          </div>
+          <div style={S.pArtist}>{s.artist}</div>
+        </div>
+      </div>
+    ))}
+  </>
+);
+
 export default function MusicPlayer() {
   const [songs, setSongs] = useState(_initialQ);
   const songsRef = useRef(songs);
@@ -604,136 +762,6 @@ export default function MusicPlayer() {
     .mp-pl::-webkit-scrollbar-thumb { background:rgba(200,151,58,0.35);border-radius:999px; }
   `;
 
-  const ProgressBar = ({
-    onClick,
-  }: {
-    onClick: React.MouseEventHandler<HTMLDivElement>;
-  }) => (
-    <div
-      style={{
-        width: "100%",
-        height: "3px",
-        background: "rgba(255,255,255,0.08)",
-        position: "relative",
-        cursor: "pointer",
-      }}
-      onClick={onClick}
-    >
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          height: "100%",
-          width: `${progress * 100}%`,
-          background: "linear-gradient(90deg,#e8375a,#c8973a)",
-          borderRadius: "0 999px 999px 0",
-          transition: "width 0.25s linear",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: `${progress * 100}%`,
-          width: "9px",
-          height: "9px",
-          background: "#fff5f0",
-          borderRadius: "50%",
-          transform: "translate(-50%,-50%)",
-          boxShadow: "0 0 6px rgba(232,55,90,0.8)",
-          transition: "left 0.25s linear",
-        }}
-      />
-    </div>
-  );
-
-  const VolumeRow = ({ compact }: { compact?: boolean }) => (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: compact ? "0.4rem" : "0.5rem",
-        marginTop: compact ? 0 : "0.85rem",
-      }}
-    >
-      <button
-        style={{
-          ...S.iconBtn,
-          padding: 0,
-          flexShrink: 0,
-          color: muted ? "rgba(255,245,240,0.3)" : "rgba(255,245,240,0.55)",
-        }}
-        onClick={toggleMute}
-      >
-        <VolumeIcon muted={muted} volume={volume} />
-      </button>
-      <input
-        type="range"
-        min={0}
-        max={100}
-        step={1}
-        value={dv}
-        onChange={handleVolumeChange}
-        className="mp-vol"
-        aria-label="Volume"
-      />
-    </div>
-  );
-
-  const PlaylistItems = ({ onSelect }: { onSelect: () => void }) => (
-    <>
-      <div style={S.pTitle}>♪ Playlist</div>
-      {songs.map((s, i) => (
-        <div
-          key={`${s.id}-${i}`}
-          style={{
-            ...S.pItem,
-            background: i === index ? "rgba(232,55,90,0.12)" : "transparent",
-          }}
-          onClick={() => {
-            goTo(i);
-            onSelect();
-          }}
-          onMouseEnter={(e) => {
-            if (i !== index)
-              (e.currentTarget as HTMLDivElement).style.background =
-                "rgba(255,255,255,0.04)";
-          }}
-          onMouseLeave={(e) => {
-            if (i !== index)
-              (e.currentTarget as HTMLDivElement).style.background =
-                "transparent";
-          }}
-        >
-          <span
-            style={{
-              ...S.pNum,
-              color: i === index ? "#e8375a" : "rgba(255,245,240,0.3)",
-              animation:
-                i === index && playing
-                  ? "mpPulse 1.5s ease-in-out infinite"
-                  : "none",
-            }}
-          >
-            {i === index && playing ? "♪" : i + 1}
-          </span>
-          <div style={S.pInfo}>
-            <div
-              style={{
-                ...S.pSong,
-                color: i === index ? "#fff5f0" : "rgba(255,245,240,0.75)",
-              }}
-            >
-              {s.title}
-            </div>
-            <div style={S.pArtist}>{s.artist}</div>
-          </div>
-        </div>
-      ))}
-    </>
-  );
-
   return (
     <>
       <style>{css}</style>
@@ -800,7 +828,7 @@ export default function MusicPlayer() {
         </div>
       )}
 
-      {/* ══ MOBILE: slim bar with volume ══ */}
+      {/*  MOBILE: slim bar with volume   */}
       {mobile && (
         <>
           {showPlaylist && (
@@ -819,7 +847,13 @@ export default function MusicPlayer() {
                 boxShadow: "0 -4px 20px rgba(0,0,0,0.5)",
               }}
             >
-              <PlaylistItems onSelect={() => setShowPlaylist(false)} />
+              <PlaylistItems
+                onSelect={() => setShowPlaylist(false)}
+                songs={songs}
+                index={index}
+                playing={playing}
+                goTo={goTo}
+              />
             </div>
           )}
           <div
@@ -836,7 +870,7 @@ export default function MusicPlayer() {
               paddingBottom: "env(safe-area-inset-bottom,0px)",
             }}
           >
-            <ProgressBar onClick={seek} />
+            <ProgressBar onClick={seek} progress={progress} />
             {/* Main row */}
             <div
               style={{
@@ -917,18 +951,31 @@ export default function MusicPlayer() {
             </div>
             {/* Volume row */}
             <div style={{ padding: "0 0.9rem 0.5rem" }}>
-              <VolumeRow compact />
+              <VolumeRow
+                compact
+                muted={muted}
+                volume={volume}
+                dv={dv}
+                toggleMute={toggleMute}
+                handleVolumeChange={handleVolumeChange}
+              />
             </div>
           </div>
         </>
       )}
 
-      {/* ══ DESKTOP FULL: floating card ══ */}
+      {/*  DESKTOP FULL: floating card  */}
       {!mobile && (
         <div style={S.wrap}>
           {showPlaylist && (
             <div style={S.playlist} className="mp-pl">
-              <PlaylistItems onSelect={() => setShowPlaylist(false)} />
+              <PlaylistItems
+                onSelect={() => setShowPlaylist(false)}
+                songs={songs}
+                index={index}
+                playing={playing}
+                goTo={goTo}
+              />
             </div>
           )}
           <div style={S.card}>
@@ -1047,7 +1094,13 @@ export default function MusicPlayer() {
                 <ListIcon />
               </button>
             </div>
-            <VolumeRow />
+            <VolumeRow
+              muted={muted}
+              volume={volume}
+              dv={dv}
+              toggleMute={toggleMute}
+              handleVolumeChange={handleVolumeChange}
+            />
             <div
               style={{
                 textAlign: "center",
