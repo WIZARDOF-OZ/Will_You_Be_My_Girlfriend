@@ -383,7 +383,7 @@ export default function MusicPlayer() {
   shuffleRef.current = shuffle;
 
   const stopTick = useCallback(() => {
-    if (tickRef.current) cancelAnimationFrame(tickRef.current);
+    if (tickRef.current) window.clearTimeout(tickRef.current);
   }, []);
 
   const startTick = useCallback(() => {
@@ -397,10 +397,14 @@ export default function MusicPlayer() {
         setCurrent(t);
         setDuration(d);
         setProgress(d > 0 ? t / d : 0);
-      } catch (_) {}
-      tickRef.current = requestAnimationFrame(tick);
+      } catch {
+        // this is intentional to catch error
+      }
+      // call tick again in 250ms
+      tickRef.current = window.setTimeout(tick, 250);
     };
-    tickRef.current = requestAnimationFrame(tick);
+    // start the first tick
+    tickRef.current = window.setTimeout(tick, 250);
   }, [stopTick]);
 
   const goTo = useCallback(
@@ -624,6 +628,7 @@ export default function MusicPlayer() {
           width: `${progress * 100}%`,
           background: "linear-gradient(90deg,#e8375a,#c8973a)",
           borderRadius: "0 999px 999px 0",
+          transition: "width 0.25s linear",
         }}
       />
       <div
@@ -637,6 +642,7 @@ export default function MusicPlayer() {
           borderRadius: "50%",
           transform: "translate(-50%,-50%)",
           boxShadow: "0 0 6px rgba(232,55,90,0.8)",
+          transition: "left 0.25s linear",
         }}
       />
     </div>

@@ -17,7 +17,7 @@ export default function HeroSection() {
         .join("");
 
       // Animate title letters
-      animate(titleRef.current.querySelectorAll("span"), {
+      const titleAnim = animate(titleRef.current.querySelectorAll("span"), {
         opacity: [0, 1],
         translateY: [40, 0],
         delay: stagger(60),
@@ -26,14 +26,19 @@ export default function HeroSection() {
       });
 
       // Animate emoji after title finishes
+      let emojiAnim: ReturnType<typeof animate> | undefined;
       if (emojiRef.current)
-        animate(emojiRef.current, {
+        emojiAnim = animate(emojiRef.current, {
           opacity: [0, 1],
           translateY: [40, 0],
           delay: 1400,
           ease: "outExpo",
           duration: 800,
         });
+      return () => {
+        titleAnim.pause();
+        if (emojiAnim) emojiAnim.pause();
+      };
     }
   }, []);
 

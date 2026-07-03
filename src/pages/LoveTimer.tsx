@@ -157,9 +157,12 @@ export default function LoveTimer() {
   useEffect(() => {
     if (!hasAnimated.current && wrapRef.current) {
       hasAnimated.current = true;
+      let labelAnim: ReturnType<typeof animate> | undefined;
+      let unitsAnim: ReturnType<typeof animate> | undefined;
+      let captionAnim: ReturnType<typeof animate> | undefined;
 
       if (labelRef.current) {
-        animate(labelRef.current, {
+        labelAnim = animate(labelRef.current, {
           opacity: [0, 1],
           translateY: [20, 0],
           duration: 700,
@@ -168,7 +171,7 @@ export default function LoveTimer() {
         });
       }
 
-      animate(wrapRef.current.querySelectorAll(".timer-unit"), {
+      unitsAnim = animate(wrapRef.current.querySelectorAll(".timer-unit"), {
         opacity: [0, 1],
         translateY: [40, 0],
         scale: [0.8, 1],
@@ -178,7 +181,7 @@ export default function LoveTimer() {
       });
 
       if (captionRef.current) {
-        animate(captionRef.current, {
+        captionAnim = animate(captionRef.current, {
           opacity: [0, 1],
           translateY: [20, 0],
           duration: 700,
@@ -186,6 +189,12 @@ export default function LoveTimer() {
           delay: 900,
         });
       }
+
+      return () => {
+        if (labelAnim) labelAnim.pause();
+        if (unitsAnim) unitsAnim.pause();
+        if (captionAnim) captionAnim.pause();
+      };
     }
   }, []);
 

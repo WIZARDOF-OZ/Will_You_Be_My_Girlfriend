@@ -19,16 +19,17 @@ export default function YesPage() {
             `<span style="display: inline-block; opacity:0;">${ch === " " ? "&nbsp;" : ch}</span>`,
         )
         .join("");
-      animate(titleRef.current.querySelectorAll("span"), {
+      const titleAnim = animate(titleRef.current.querySelectorAll("span"), {
         opacity: [0, 1],
         translateY: [30, 0],
         delay: stagger(60),
         ease: "outExpo",
         duration: 800,
       });
-
+      let subtitleAnim: ReturnType<typeof animate> | undefined;
+      let emojiAnim: ReturnType<typeof animate> | undefined;
       if (subtitleRef.current) {
-        animate(subtitleRef.current, {
+        subtitleAnim = animate(subtitleRef.current, {
           opacity: [0, 1],
           translateY: [20, 0],
           delay: 1200,
@@ -37,13 +38,18 @@ export default function YesPage() {
         });
       }
       if (emojiRef.current)
-        animate(emojiRef.current, {
+        emojiAnim = animate(emojiRef.current, {
           opacity: [0, 1],
           translateY: [30, 0],
           delay: 1800,
           duration: 800,
           ease: "outExpo",
         });
+      return () => {
+        titleAnim.pause();
+        if (subtitleAnim) subtitleAnim.pause();
+        if (emojiAnim) emojiAnim.pause();
+      };
     }
   }, []);
 

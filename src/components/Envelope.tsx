@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { animate } from "animejs";
 import { useNavigate } from "react-router-dom";
 const MESSAGES = [
@@ -13,7 +13,26 @@ const MESSAGES = [
   "Last warning... 👀",
   "The No button has left the chat 🤭",
 ];
+const CONFETTI_PIECES = Array.from({ length: 30 }, (_, i) => ({
+  id: i,
+  left: `${Math.random() * 100}%`,
+  width: `${8 + Math.random() * 8}px`,
+  height: `${8 + Math.random() * 8}px`,
+  bg: ["#e8375a", "#c8973a", "#ff6b8a", "#fff5f0", "#f48fb1", "#ffcc00"][
+    Math.floor(Math.random() * 6)
+  ],
+  delay: `${Math.random() * 2}s`,
+  duration: `${2 + Math.random() * 3}s`,
+  borderRadius: `Math.random() > 0.5 ? "50%" : "2px"`,
+}));
 
+const BALLOONS = Array.from({ length: 8 }, (_, i) => ({
+  id: i,
+  emoji: ["🎈", "🎀", "💕", "🌹", "✨", "🎊", "💝", "🎉"][i],
+  left: `${10 + i * 12}%`,
+  duration: `${3 + Math.random() * 2}s`,
+  delay: `${Math.random() * 1.5}s`,
+}));
 function CountdownRedirect() {
   const [count, setCount] = useState(3);
   const navigate = useNavigate();
@@ -41,6 +60,7 @@ function CountdownRedirect() {
     </p>
   );
 }
+
 export default function Envelope() {
   const envelopeRef = useRef<HTMLDivElement>(null);
   const flapRef = useRef<SVGGElement>(null);
@@ -61,13 +81,16 @@ export default function Envelope() {
   // Floating loop
   useEffect(() => {
     if (!envelopeRef.current) return;
-    animate(envelopeRef.current, {
+
+    const floatAnim = animate(envelopeRef.current, {
       translateY: [-6, 6],
       duration: 2200,
       ease: "inOutSine",
       loop: true,
       alternate: true,
     });
+
+    return () => floatAnim.pause();
   }, []);
 
   const getRandomPos = () => {
@@ -163,44 +186,37 @@ export default function Envelope() {
           }}
         >
           {/* Confetti pieces */}
-          {[...Array(30)].map((_, i) => (
+          {CONFETTI_PIECES.map((pieces) => (
             <div
-              key={i}
+              key={pieces.id}
               style={{
                 position: "absolute",
+                left: pieces.left,
+                width: pieces.width,
+                height: pieces.height,
+                background: pieces.bg,
+                animation: `floatUp ${pieces.duration} ease-in ${pieces.delay} infinite`,
                 bottom: "-20px",
-                left: `${Math.random() * 100}%`,
-                width: `${8 + Math.random() * 8}px`,
-                height: `${8 + Math.random() * 8}px`,
-                borderRadius: Math.random() > 0.5 ? "50%" : "2px",
-                background: [
-                  "#e8375a",
-                  "#c8973a",
-                  "#ff6b8a",
-                  "#fff5f0",
-                  "#f48fb1",
-                  "#ffcc00",
-                ][Math.floor(Math.random() * 6)],
-                animation: `floatUp ${2 + Math.random() * 3}s ease-in ${Math.random() * 2}s infinite`,
+                borderRadius: pieces.borderRadius,
                 opacity: 0,
               }}
             />
           ))}
 
           {/* Balloons */}
-          {[...Array(8)].map((_, i) => (
+          {BALLOONS.map((balloon) => (
             <div
-              key={`b${i}`}
+              key={`b${balloon.id}`}
               style={{
                 position: "absolute",
                 bottom: "-100px",
-                left: `${10 + i * 12}%`,
+                left: balloon.left,
                 fontSize: "3rem",
-                animation: `floatUp ${3 + Math.random() * 2}s ease-in ${Math.random() * 1.5}s infinite`,
+                animation: `floatUp ${balloon.duration} ease-in ${balloon.delay} infinite`,
                 opacity: 0,
               }}
             >
-              {["🎈", "🎀", "💕", "🌹", "✨", "🎊", "💝", "🎉"][i]}
+              {balloon.emoji}
             </div>
           ))}
 
