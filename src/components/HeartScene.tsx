@@ -117,6 +117,10 @@ export default function HeartScene() {
       cancelAnimationFrame(frameId);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("resize", onResize);
+      hearts.forEach((heart) => {
+        heart.geometry.dispose();
+        (heart.material as THREE.MeshStandardMaterial).dispose();
+      });
       renderer.dispose();
       if (mount.contains(renderer.domElement))
         mount.removeChild(renderer.domElement);

@@ -515,9 +515,12 @@ export default function MusicPlayer() {
     }
     return () => {
       stopTickRef.current();
+      playerRef.current?.destroy();
       try {
         document.body.removeChild(container);
-      } catch (_) {}
+      } catch {
+        // this is intentional to catch error
+      }
     };
   }, []);
 
@@ -527,7 +530,11 @@ export default function MusicPlayer() {
 
   const togglePlay = () => {
     if (!ready || !playerRef.current) return;
-    playing ? playerRef.current.pauseVideo() : playerRef.current.playVideo();
+    if (playing) {
+      playerRef.current.pauseVideo();
+    } else {
+      playerRef.current.playVideo();
+    }
   };
   const goPrev = () => {
     if (current > 3) {
