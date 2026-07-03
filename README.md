@@ -6,6 +6,8 @@
 
 Tap open a letter, dodge the inevitable _No_, celebrate the _Yes_, and explore a story written just for one person.
 
+**[🚀 View Live Demo](https://will-youbemy-wifey.vercel.app/)**
+
 <br />
 
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white)
@@ -23,6 +25,27 @@ Tap open a letter, dodge the inevitable _No_, celebrate the _Yes_, and explore a
 **Will You Be My Girlfriend** is a single-page romantic web app that turns a simple question into a full interactive experience. It combines a 3D heart backdrop, animated typography, a playful envelope interaction, a curated music player, and a post-_Yes_ celebration page with a live relationship timer and a flip-through love book.
 
 The app is designed to feel intimate and polished - like a digital love letter, not a generic template.
+
+---
+
+## Screenshots
+
+<div align="center">
+  <img src="docs/screenshots/home.png" width="800" alt="Home Page" />
+  <br/>
+  <i>The 3D floating hearts and animated title</i>
+  <br/><br/>
+  
+  <img src="docs/screenshots/intro.png" width="400" alt="Letter Interaction" />
+  <img src="docs/screenshots/yes-page.png" width="400" alt="Yes Page" />
+  <br/>
+  <i>Interactive envelope and post-yes celebration</i>
+  <br/><br/>
+
+  <img src="docs/screenshots/love-timer.png" width="800" alt="Love Timer & Journey Book" />
+  <br/>
+  <i>Relationship counter and interactive love book</i>
+</div>
 
 ---
 
