@@ -537,9 +537,6 @@ export default function MusicPlayer() {
     return () => window.removeEventListener("resize", h);
   }, []);
 
-  indexRef.current = index;
-  shuffleRef.current = shuffle;
-
   const stopTick = useCallback(() => {
     if (tickRef.current) window.clearTimeout(tickRef.current);
   }, []);
@@ -594,10 +591,14 @@ export default function MusicPlayer() {
     );
   }, [goTo]);
 
-  goNextRef.current = goNext;
-  goToRef.current = goTo;
-  startTickRef.current = startTick;
-  stopTickRef.current = stopTick;
+  useEffect(() => {
+    indexRef.current = index;
+    shuffleRef.current = shuffle;
+    goNextRef.current = goNext;
+    goToRef.current = goTo;
+    startTickRef.current = startTick;
+    stopTickRef.current = stopTick;
+  }, [index, shuffle, goNext, goTo, startTick, stopTick]);
 
   /*   YouTube: imperative container, empty deps, mirror refs   */
   useEffect(() => {

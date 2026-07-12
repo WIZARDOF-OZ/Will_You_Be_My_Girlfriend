@@ -1,0 +1,41 @@
+components:
+  - changed-files:
+    - any-glob-to-any-file: 'src/components/**/*'
+
+pages:
+  - changed-files:
+    - any-glob-to-any-file: 'src/pages/**/*'
+
+styles:
+  - changed-files:
+    - any-glob-to-any-file: '**/*.css'
+
+config:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - 'vite.config.ts'
+      - 'tsconfig*.json'
+      - 'eslint.config.js'
+      - 'vercel.json'
+
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'package.json'
+      - 'package-lock.json'
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - 'README.md'
+      - 'docs/**/*'
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file: '.github/workflows/**/*'
+
+assets:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - 'public/**/*'
+      - 'src/assets/**/*'

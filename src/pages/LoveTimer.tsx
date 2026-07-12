@@ -158,7 +158,6 @@ export default function LoveTimer() {
     if (!hasAnimated.current && wrapRef.current) {
       hasAnimated.current = true;
       let labelAnim: ReturnType<typeof animate> | undefined;
-      let unitsAnim: ReturnType<typeof animate> | undefined;
       let captionAnim: ReturnType<typeof animate> | undefined;
 
       if (labelRef.current) {
@@ -171,7 +170,7 @@ export default function LoveTimer() {
         });
       }
 
-      unitsAnim = animate(wrapRef.current.querySelectorAll(".timer-unit"), {
+      const unitsAnim = animate(wrapRef.current.querySelectorAll(".timer-unit"), {
         opacity: [0, 1],
         translateY: [40, 0],
         scale: [0.8, 1],
