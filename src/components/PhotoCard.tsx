@@ -1,5 +1,5 @@
 import React from "react";
-import { Memory } from "../data/memories";
+import type { Memory } from "../data/memories";
 
 interface PhotoCardProps {
   memory: Memory;
