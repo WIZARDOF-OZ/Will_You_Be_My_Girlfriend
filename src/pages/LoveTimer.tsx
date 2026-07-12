@@ -191,6 +191,7 @@ export default function LoveTimer() {
       }
 
       return () => {
+        hasAnimated.current = false;
         if (labelAnim) labelAnim.pause();
         if (unitsAnim) unitsAnim.pause();
         if (captionAnim) captionAnim.pause();

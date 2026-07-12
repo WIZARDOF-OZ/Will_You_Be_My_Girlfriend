@@ -7,18 +7,12 @@ export default function YesPage() {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const emojiRef = useRef<HTMLSpanElement>(null);
+  const titleText = "My Girlfriend";
+
   useEffect(() => {
     // Animate the title letters
 
     if (titleRef.current) {
-      const text = titleRef.current.textContent ?? "";
-      titleRef.current.innerHTML = text
-        .split("")
-        .map(
-          (ch) =>
-            `<span style="display: inline-block; opacity:0;">${ch === " " ? "&nbsp;" : ch}</span>`,
-        )
-        .join("");
       const titleAnim = animate(titleRef.current.querySelectorAll("span"), {
         opacity: [0, 1],
         translateY: [30, 0],
@@ -115,7 +109,11 @@ export default function YesPage() {
                 marginBottom: "1rem",
               }}
             >
-              My Girlfriend
+              {titleText.split("").map((ch, i) => (
+                <span key={i} style={{ display: "inline-block", opacity: 0 }}>
+                  {ch === " " ? "\u00A0" : ch}
+                </span>
+              ))}
             </h1>
             {/* Emoji animated separately */}
             <span

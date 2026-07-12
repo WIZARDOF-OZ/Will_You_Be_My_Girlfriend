@@ -5,17 +5,10 @@ export default function HeroSection() {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const emojiRef = useRef<HTMLSpanElement>(null);
 
+  const titleText = "For My Favourite Person";
+
   useEffect(() => {
     if (titleRef.current) {
-      const text = titleRef.current.textContent ?? "";
-      titleRef.current.innerHTML = text
-        .split("")
-        .map(
-          (ch) =>
-            `<span style="display:inline-block; opacity:0">${ch === " " ? "&nbsp;" : ch}</span>`,
-        )
-        .join("");
-
       // Animate title letters
       const titleAnim = animate(titleRef.current.querySelectorAll("span"), {
         opacity: [0, 1],
@@ -74,7 +67,11 @@ export default function HeroSection() {
             lineHeight: 1.1,
           }}
         >
-          For My Favourite Person
+          {titleText.split("").map((ch, i) => (
+            <span key={i} style={{ display: "inline-block", opacity: 0 }}>
+              {ch === " " ? "\u00A0" : ch}
+            </span>
+          ))}
         </h1>
         {/* Emoji animated separately */}
         <span

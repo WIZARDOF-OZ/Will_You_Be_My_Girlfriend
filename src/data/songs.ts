@@ -30,6 +30,11 @@ export const FEATURED_SONGS = [
     artist: "Alex Warren",
   },
   {
+    id: "i0_m90T04uw",
+    title: "Kamariya",
+    artist: "Darshan Raval",
+  },
+  {
     id: "fldKt9IIUyU",
     title: "Made in Japan",
     artist: "Buck Owens",
