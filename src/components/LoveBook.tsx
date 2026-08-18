@@ -16,9 +16,9 @@ const PAGES = [
     title: "The Beginning",
     emoji: "🌱",
     content: [
-      "The first time I met you in Grade 5, I never imagined you would become this important to me. Back then, we were just school friends  same bus rides, small conversations.",
-      "When you changed schools in Class 7, life moved on. But fate had different plans.",
-      "Meeting you again in 12th grade felt unreal  like a story getting a second chance. Talking to you on Instagram slowly became the best part of my day.",
+      "The first time I met you in Grade XX, I never imagined you would become this important to me. Back then, we were just school friends  same bus rides, small conversations.",
+      "When you changed schools in Class XX, life moved on. But fate had different plans.",
+      "Meeting you again in XXth grade felt unreal  like a story getting a second chance. Talking to you on Instagram slowly became the best part of my day.",
       "The day I confessed my feelings was one of the most nervous moments of my life. When you said yes  it honestly felt like the world stopped for a second. In the best way possible.",
     ],
   },
